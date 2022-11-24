@@ -4,9 +4,9 @@ EC2_INSTANCE_DESCRIPTOR
 
 EC2 instances descriptor with boto 3
 
-Required tools
+Read The Docs
 ^^^^^^^^^^^^^^
 
-    * `ReadTheDocs_EC2_Descriptor`_.
+    * `EC2_Descriptor`_.
 
-.. _ReadTheDocs_EC2_Descriptor: ec2-instance-descriptor.readthedocs.io
+.. _EC2_Descriptor: ec2-instance-descriptor.readthedocs.io
