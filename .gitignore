@@ -1,0 +1,7 @@
+.aws-sam/build/template.yaml
+.vscode/launch.json
+.vscode/settings.json
+.aws-sam/build.toml
+app/__pycache__
+docs/build/
+.venv
