@@ -7,6 +7,6 @@ EC2 instances descriptor with boto 3
 Required tools
 ^^^^^^^^^^^^^^
 
-    * `ReadTheDocs`_.
+    * `ReadTheDocs_EC2_Descriptor`_.
 
-.. _ReadTheDocs: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html
+.. _ReadTheDocs_EC2_Descriptor: ec2-instance-descriptor.readthedocs.io
