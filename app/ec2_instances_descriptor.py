@@ -85,7 +85,7 @@ def ec2_instances_desc(event, context):
     boto_requests = [EC2_Boto(region_name=region)
                      for region in available_regions]
 
-    security_groups_routine(security_groups_requests=boto_requests)
+    # security_groups_routine(security_groups_requests=boto_requests)
     ec2_instances_routine(ec2_instances_requests=boto_requests)
 
     # fields = ['Instance ID', 'Description', 'Region']

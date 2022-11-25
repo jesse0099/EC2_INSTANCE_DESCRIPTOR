@@ -19,6 +19,7 @@ debugpy = { version = "1.6.3", optional = true }
 [tool.poetry.extras]
 docs = ["sphinx", "sphinx-rtd-theme"]
 build_and_debug = ["boto3", "debugpy"]
+all_extras = ["sphinx", "sphinx-rtd-theme", "boto3", "debugpy"]
 
 [build-system]
 requires = ["poetry-core"]

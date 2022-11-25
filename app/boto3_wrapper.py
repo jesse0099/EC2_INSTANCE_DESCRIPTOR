@@ -32,6 +32,15 @@ class EC2_Boto:
 
     @staticmethod
     def ec2_tags_get_value(tags, key):
+        """Get the value of an ec2-tag, given a tags list and a key.
+
+        :param tags:  EC2 instance list of tags.
+        :type tags: [{'Key': 'String', 'Value': 'String'...}]
+        :param key: EC2 instance tag key.
+        :type key: String
+        :return: String value of the tag if it's present, empty string otherwise.
+        :rtype: String
+        """
         if tags is None:
             return ''
         desired_tag = [tag for tag in tags if tag.get(
