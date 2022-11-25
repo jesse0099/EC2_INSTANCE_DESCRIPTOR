@@ -17,10 +17,6 @@ Installation/Usage
 The Script is being developed assuming an AWS lambda function execution environment, according to 
 the specification of SAM \(Serverless Application Model\).
 
-.. todo:: 
-    The template is not present in the public repository due to security reasons. 
-    Future versions will include a secure template defining all necessary AWS resources.
-
 
 Required tools
 **************
@@ -136,6 +132,29 @@ Deploy
 |       ``--region {AWS Region name}``
 |       ``--stack-name {AWS Stack Name}`` 
 |       ``--capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM``
+
+Build the Docs
+**************
+
+To build the documentation, you only need Sphinx, a theme of your choice, and, of course,
+the docs/source directory. You can use the Sphinx module provided as optional in the 
+"pyproject.toml" file. 
+
+*Inside the virtual environment*
+
+Move to docs/. Once you have done that, you can execute the following commands:
+
+    * ``make clean``
+        Deletes the content of docs/build folder.
+    * ``make html``
+        Based on the content of the docs/source directory and the doc-strings from the app/,  
+        generates documentation for the project in HTML under docs/build. Other formats are available, 
+        as you can see in `Sphinx Docs`_. 
+
+
+After executing ``make html``, local documentation will be available. However, the readTheDocs-Page won't 
+be updated. To accomplish the online docs update. You need to commit and push the desired changes to the 
+master branch.
 
 .. note::
     Execute at repository root level. In depth information can be found in: 

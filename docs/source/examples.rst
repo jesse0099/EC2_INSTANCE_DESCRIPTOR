@@ -146,14 +146,16 @@ Move to docs/. Once you have done that, you can execute the following commands:
         Deletes the content of docs/build folder.
     * ``make html``
         Based on the content of the docs/source directory and the doc-strings from the app/,  
-        generates documentation for the project in HTML. Other formats are available, as
-        you can see in `Sphinx Docs`_. 
+        generates documentation for the project in HTML under docs/build. Other formats are available, 
+        as you can see in `Sphinx Docs`_. 
 
+
+After executing ``make html``, local documentation will be available. However, the readTheDocs-Page won't 
+be updated. To accomplish the online docs update. You need to commit and push the desired changes to the 
+master branch.
 
 .. note::
     Execute at repository root level. In depth information can be found in: 
-
-
 
 .. todo::
     Installation/Usage documentation is not as detailed as I would like. 
