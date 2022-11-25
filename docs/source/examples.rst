@@ -73,6 +73,9 @@ Poetry venv deactivation/exit
 
 Poetry, dependencies installation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+*Inside the virtual environment*
+
 |   The following command will install all the not optional dependencies defined in the ``pyproject.toml``:
     
         ``poetry install``: The install command reads the ``pyproject.toml`` file from the current project, 
@@ -96,10 +99,19 @@ Poetry, dependencies installation
 Execution 
 *********
 
+Build
+^^^^^
+| ``sam build``
+
+.. note::
+    Execute at repository root level. In depth information can be found in: 
+
 Local Invoke
 ^^^^^^^^^^^^
 | ``sam local invoke``
-| In depth information can be found in: 
+
+.. note::
+    Execute at repository root level. In depth information can be found in: 
 
 Debug 
 ***** 
@@ -119,13 +131,18 @@ Deploy
 |       ``--stack-name {AWS Stack Name}`` 
 |       ``--capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM``
 
+.. note::
+    Execute at repository root level. In depth information can be found in: 
+
+
+
 .. todo::
     Installation/Usage documentation is not as detailed as I would like. 
     Fix it when the time comes.
 .. todo::
     Explain the reason to create optional dependencies.
 .. todo::
-    Populate in depth information where required.
+    Populate in depth information where required. When the time comes.
 
 .. _SAM cli Install: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html
 .. _Docker Install: https://docs.docker.com/get-docker/
