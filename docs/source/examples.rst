@@ -131,6 +131,25 @@ Deploy
 |       ``--stack-name {AWS Stack Name}`` 
 |       ``--capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM``
 
+Build the Docs
+**************
+
+To build the documentation, you only need Sphinx, a theme of your choice, and, of course,
+the docs/source directory. You can use the Sphinx module provided as optional in the 
+"pyproject.toml" file. 
+
+*Inside the virtual environment*
+
+Move to docs/. Once you have done that, you can execute the following commands:
+
+    * ``make clean``
+        Deletes the content of docs/build folder.
+    * ``make html``
+        Based on the content of the docs/source directory and the doc-strings from the app/,  
+        generates documentation for the project in HTML. Other formats are available, as
+        you can see in `Sphinx Docs`_. 
+
+
 .. note::
     Execute at repository root level. In depth information can be found in: 
 
@@ -150,3 +169,4 @@ Deploy
 .. _Python Docs and Install \(3.9\): https://www.python.org/downloads/
 .. _GitHub Repository: https://github.com/jesse0099/EC2_INSTANCE_DESCRIPTOR
 .. _poetry shell: https://python-poetry.org/docs/cli/#:~:text=has%20no%20option.-,shell,-The%20shell%20command
+.. _Sphinx Docs: https://www.sphinx-doc.org/en/master/
