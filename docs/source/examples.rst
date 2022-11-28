@@ -69,7 +69,7 @@ Poetry venv deactivation/exit
     * ``deactivate``
     * ``exit``
 
-    In depth information can be found in: 
+    In depth information can be found in: {}.
 
 Poetry, dependencies installation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -104,14 +104,14 @@ Build
 | ``sam build``
 
 .. note::
-    Execute at repository root level. In depth information can be found in: 
+    Execute at repository root level. In depth information can be found in: {}.
 
 Local Invoke
 ^^^^^^^^^^^^
 | ``sam local invoke``
 
 .. note::
-    Execute at repository root level. In depth information can be found in: 
+    Execute at repository root level. In depth information can be found in: {}.
 
 Debug 
 ***** 
@@ -130,6 +130,9 @@ Deploy
 |       ``--region {AWS Region name}``
 |       ``--stack-name {AWS Stack Name}`` 
 |       ``--capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM``
+
+.. note::
+    Execute at repository root level. In depth information can be found in: {}.
 
 Build the Docs
 **************
@@ -155,7 +158,7 @@ be updated. To accomplish the online docs update. You need to commit and push th
 master branch.
 
 .. note::
-    Execute at repository root level. In depth information can be found in: 
+    Execute at repository root/docs level. In depth information can be found in: `Sphinx Docs`_.
 
 .. todo::
     Installation/Usage documentation is not as detailed as I would like. 
