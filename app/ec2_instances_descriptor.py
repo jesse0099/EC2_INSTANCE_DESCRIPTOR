@@ -1,4 +1,5 @@
 import os
+
 # import logging
 import json
 from airtable_wrapper import Airtable_Api
@@ -17,18 +18,27 @@ ec2_security_groups_tid = os.environ.get("EC2_SECURITY_GROUPS_TID")
 ec2_old_documentation_tbname = os.environ.get("EC2_OLD_DOCUMENTATION_TID")
 
 airtable_api_client = Airtable_Api(
-    _base_url=airtable_base_url, _api_key=airtable_api_key)
+    _base_url=airtable_base_url, _api_key=airtable_api_key
+)
+
 # Nearly (X,,D) Generic function to handle errors inside list comprehension.
 
 
-def catch(func, *args, handle=lambda e, kwargs=None: print('EXCEPTION:EC2_INSTANCES_DESCRIPTOR', e, kwargs), **kwargs):
+def catch(
+    func,
+    *args,
+    handle=lambda e, kwargs=None: print(
+        "EXCEPTION:EC2_INSTANCES_DESCRIPTOR", e, kwargs
+    ),
+    **kwargs
+):
     try:
-        if (func is not None and (not isinstance(func, list))):  # Not invocable function
+        if func is not None and (not isinstance(func, list)):  # Not invocable function
             return func(*args, **kwargs)
     except ClientError as e:
-        if 'DryRunOperation' not in str(e):
+        if "DryRunOperation" not in str(e):
             return handle(e, kwargs)
-        return print('INFO', 'DryRunOperation Success')
+        return print("INFO", "DryRunOperation Success")
     except TypeError as e:
         return handle(e)
     except KeyError as e:
@@ -38,28 +48,39 @@ def catch(func, *args, handle=lambda e, kwargs=None: print('EXCEPTION:EC2_INSTAN
 
 
 def security_groups_routine(**kwargs):
-    security_groups_requests = kwargs.get('security_groups_requests')
+    security_groups_requests = kwargs.get("security_groups_requests")
     # # Fetch security groups requests
-    [catch(group.fetch_security_groups)
-     for group in security_groups_requests]
+    [catch(group.fetch_security_groups) for group in security_groups_requests]
 
-    records = flatten([security_groups_to_records(groups=groups.security_groups, region=groups.region)
-                       for groups in security_groups_requests])
+    records = flatten(
+        [
+            security_groups_to_records(
+                groups=groups.security_groups, region=groups.region
+            )
+            for groups in security_groups_requests
+        ]
+    )
 
-    print('INFO:EC2_INSTANCES_DESCRIPTOR',
-          'Number of scanned security groups:', len(records))
+    print(
+        "INFO:EC2_INSTANCES_DESCRIPTOR",
+        "Number of scanned security groups:",
+        len(records),
+    )
 
     # # Send security groups collected data to Airtable (Upsert)
-    catch(airtable_api_client.upsert(_records=records,
-                                     _table_tid=ec2_security_groups_tid,
-                                     _fields_to_merge_on=['Group ID']))
+    catch(
+        airtable_api_client.upsert(
+            _records=records,
+            _table_tid=ec2_security_groups_tid,
+            _fields_to_merge_on=["Group ID"],
+        )
+    )
 
 
 def ec2_instances_routine(**kwargs):
-    ec2_instances_requests = kwargs.get('ec2_instances_requests')
+    ec2_instances_requests = kwargs.get("ec2_instances_requests")
     # # Fetch ec2 instances
-    [catch(request.fetch_ec2_instances)
-     for request in ec2_instances_requests]
+    [catch(request.fetch_ec2_instances) for request in ec2_instances_requests]
 
     # # Create a Tag whit Key 'Description' if it's not already present
     # # Not required by the time, but even if it's present, the filled Description tags won't be override
@@ -67,19 +88,34 @@ def ec2_instances_routine(**kwargs):
      for request in ec2_instances_requests]
 
     # # Send EC2 instances collected data to Airtable (Upsert)
-    records = flatten([catch(ec2_instances_to_records, instances=response.instances, region=response.region)
-                       for response in ec2_instances_requests])
+    records = flatten(
+        [
+            catch(
+                ec2_instances_to_records,
+                instances=response.instances,
+                region=response.region,
+            )
+            for response in ec2_instances_requests
+        ]
+    )
 
-    print('INFO:EC2_INSTANCES_DESCRIPTOR',
-          ' Total number of scanned ec2 instances:', len(records))
+    print(
+        "INFO:EC2_INSTANCES_DESCRIPTOR",
+        " Total number of scanned ec2 instances:",
+        len(records),
+    )
 
-    catch(airtable_api_client.upsert(_records=records,
-                                     _table_tid=ec2_instances_tid,
-                                     _fields_to_merge_on=['Instance ID']))
+    catch(
+        airtable_api_client.upsert(
+            _records=records,
+            _table_tid=ec2_instances_tid,
+            _fields_to_merge_on=["Instance ID"],
+        )
+    )
 
 
 def ec2_instances_desc(event, context):
-    print('DEBUG', 'event', '\n', event)
+    print("DEBUG", "event", "\n", event)
     available_regions = EC2_Boto.get_available_regions_names()
     # # EC2 describe_instances request list
     boto_requests = [EC2_Boto(region_name=region)

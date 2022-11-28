@@ -28,6 +28,7 @@ Parallel computing strategies are not implemented in the current version.
 Working on
 **********
 * **EC2_INSTANCE_DESCRIPTOR documentation**
+* **EC2_INSTANCE DESCRIPTOR local execution capability**
 
 Future iterations
 *****************
