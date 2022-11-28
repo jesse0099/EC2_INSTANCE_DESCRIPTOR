@@ -14,6 +14,10 @@ Installation/Usage
 
 **Project Public Repository :**  `GitHub Repository`_.
 
+EC2 instances descriptor is a script that wraps boto (Amazon Official SDK for python) to make it easier to use on traceability processes as well as to enforce “resources state changed” policies (creations, terminations, modifications). Also, a set of classes and methods is provided to interact with Airtable API (REST) without using an SDK.
+
+It’s written and has been tested on Python 3.9.13. To avoid environment incompatibilities a venv is provided using Poetry.
+
 The Script is being developed assuming an AWS lambda function execution environment, according to 
 the specification of SAM \(Serverless Application Model\).
 
