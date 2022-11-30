@@ -40,14 +40,7 @@ def catch(func, *args,
 def set_environment_variables(envs):
     """Set environment variables from a context distinct from lambda.
 
-    :param envs: Dictionary of environment variables
-                environmentVariables: {
-                    AIRTABLE_API_KEY: String,
-                    AIRTABLE_BASE_URL: String,
-                    EC2_INSTANCES_TID:  String,
-                    EC2_SECURITY_GROUPS_TID: String,
-                    EC2_OLD_DOCUMENTATION_TID: String
-}
+    :param envs: Dictionary of environment variables.
     :type envs: Dictionary
     """
     airtable_api_key = envs.get("AIRTABLE_API_KEY")
@@ -135,8 +128,7 @@ def ec2_instances_routine(**kwargs):
 def ec2_instances_desc(envs):
     """EC2 instances descriptor local invocable function.
 
-    :param envs: A dictionary containing all the enviroment variables 
-                 necessary to execute the script locally.
+    :param envs: A dictionary containing all the enviroment variables necessary to execute the script locally.
     :type envs: Dictionary
     :return: Boolean indicating whether the script was successfully executed.
     :rtype: Boolean
