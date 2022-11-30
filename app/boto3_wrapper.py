@@ -49,6 +49,7 @@ class EC2_Boto:
             return desired_tag[0].get('Value')
         return ''
 
+    # # Returning bad string when tag list only contains one element, or an empty string.
     @staticmethod
     def stringify_ec2_tags(tags):
         """Stringify ec2 tags list

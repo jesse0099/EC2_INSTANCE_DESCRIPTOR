@@ -1,12 +1,12 @@
 import os
-
-# import logging
 import json
+from multipledispatch import dispatch
 from airtable_wrapper import Airtable_Api
 from airtable_wrapper import ec2_instances_to_records, security_groups_to_records
 from botocore.exceptions import ClientError
 from boto3_wrapper import EC2_Boto, flatten
 
+# # Enviroment variables fetched from lambda context
 airtable_api_key = os.environ.get("AIRTABLE_API_KEY")
 
 airtable_base_url = os.environ.get("AIRTABLE_BASE_URL")
@@ -15,23 +15,13 @@ ec2_instances_tid = os.environ.get("EC2_INSTANCES_TID")
 
 ec2_security_groups_tid = os.environ.get("EC2_SECURITY_GROUPS_TID")
 
-ec2_old_documentation_tbname = os.environ.get("EC2_OLD_DOCUMENTATION_TID")
-
-airtable_api_client = Airtable_Api(
-    _base_url=airtable_base_url, _api_key=airtable_api_key
-)
-
-# Nearly (X,,D) Generic function to handle errors inside list comprehension.
+ec2_old_documentation_tid = os.environ.get("EC2_OLD_DOCUMENTATION_TID")
 
 
-def catch(
-    func,
-    *args,
-    handle=lambda e, kwargs=None: print(
-        "EXCEPTION:EC2_INSTANCES_DESCRIPTOR", e, kwargs
-    ),
-    **kwargs
-):
+def catch(func, *args,
+          handle=lambda e, kwargs=None: print(
+              "EXCEPTION:EC2_INSTANCES_DESCRIPTOR", e, kwargs),
+          **kwargs):
     try:
         if func is not None and (not isinstance(func, list)):  # Not invocable function
             return func(*args, **kwargs)
@@ -47,7 +37,33 @@ def catch(
         return handle(e, kwargs)
 
 
+def set_environment_variables(envs):
+    """Set environment variables from a context distinct from lambda.
+
+    :param envs: Dictionary of environment variables
+                environmentVariables: {
+                    AIRTABLE_API_KEY: String,
+                    AIRTABLE_BASE_URL: String,
+                    EC2_INSTANCES_TID:  String,
+                    EC2_SECURITY_GROUPS_TID: String,
+                    EC2_OLD_DOCUMENTATION_TID: String
+}
+    :type envs: Dictionary
+    """
+    airtable_api_key = envs.get("AIRTABLE_API_KEY")
+    airtable_base_url = envs.get("AIRTABLE_BASE_URL")
+    ec2_instances_tid = envs.get("EC2_INSTANCES_TID")
+    ec2_security_groups_tid = envs.get("EC2_SECURITY_GROUPS_TID")
+
+
+def init_airtable_api_client():
+    return Airtable_Api(
+        _base_url=airtable_base_url, _api_key=airtable_api_key
+    )
+
+
 def security_groups_routine(**kwargs):
+    airtable_api_client = init_airtable_api_client()
     security_groups_requests = kwargs.get("security_groups_requests")
     # # Fetch security groups requests
     [catch(group.fetch_security_groups) for group in security_groups_requests]
@@ -78,6 +94,7 @@ def security_groups_routine(**kwargs):
 
 
 def ec2_instances_routine(**kwargs):
+    airtable_api_client = init_airtable_api_client()
     ec2_instances_requests = kwargs.get("ec2_instances_requests")
     # # Fetch ec2 instances
     [catch(request.fetch_ec2_instances) for request in ec2_instances_requests]
@@ -114,6 +131,29 @@ def ec2_instances_routine(**kwargs):
     )
 
 
+@dispatch(dict)
+def ec2_instances_desc(envs):
+    """EC2 instances descriptor local invocable function.
+
+    :param envs: A dictionary containing all the enviroment variables 
+                 necessary to execute the script locally.
+    :type envs: Dictionary
+    :return: Boolean indicating whether the script was successfully executed.
+    :rtype: Boolean
+    """
+    if envs is None:
+        return False
+    set_environment_variables(envs)
+
+    available_regions = EC2_Boto.get_available_regions_names()
+    # # EC2 describe_instances request list
+    boto_requests = [EC2_Boto(region_name=region)
+                     for region in available_regions]
+    # security_groups_routine(security_groups_requests=boto_requests)
+    ec2_instances_routine(ec2_instances_requests=boto_requests)
+
+
+@dispatch(dict, dict)
 def ec2_instances_desc(event, context):
     print("DEBUG", "event", "\n", event)
     available_regions = EC2_Boto.get_available_regions_names()
@@ -123,17 +163,5 @@ def ec2_instances_desc(event, context):
 
     # security_groups_routine(security_groups_requests=boto_requests)
     ec2_instances_routine(ec2_instances_requests=boto_requests)
-
-    # fields = ['Instance ID', 'Description', 'Region']
-    # old_descriptions = catch(airtable_api_client.get_records,
-    #                          _fields=fields,
-    #                          _view='Grid view',
-    #                          _table_tid=ec2_old_documentation_tbname)
-
-    # [catch(EC2_Boto.upsert_ec2_tags_static, rec.get('fields').get('Region'),
-    #        [{'Key': 'Description',
-    #          'Value': rec.get('fields').get('Description')}],
-    #        rec.get('fields').get('Instance ID'))
-    #  for rec in old_descriptions.get('records') if rec.get('fields').get('Description') is not None]
 
     return {"status code": 200, "body": json.dumps("Scan End V1.1")}
