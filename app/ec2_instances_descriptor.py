@@ -43,6 +43,7 @@ def set_environment_variables(envs):
     :param envs: Dictionary of environment variables.
     :type envs: Dictionary
     """
+    global airtable_api_key, airtable_base_url, ec2_instances_tid, ec2_security_groups_tid
     airtable_api_key = envs.get("AIRTABLE_API_KEY")
     airtable_base_url = envs.get("AIRTABLE_BASE_URL")
     ec2_instances_tid = envs.get("EC2_INSTANCES_TID")
@@ -124,6 +125,20 @@ def ec2_instances_routine(**kwargs):
     )
 
 
+@dispatch(dict, object)
+def ec2_instances_desc(event, context):
+    print("DEBUG", "event", "\n", event)
+    available_regions = EC2_Boto.get_available_regions_names()
+    # # EC2 describe_instances request list
+    boto_requests = [EC2_Boto(region_name=region)
+                     for region in available_regions]
+
+    # security_groups_routine(security_groups_requests=boto_requests)
+    ec2_instances_routine(ec2_instances_requests=boto_requests)
+
+    return {"status code": 200, "body": json.dumps("Scan End V1.1")}
+
+
 @dispatch(dict)
 def ec2_instances_desc(envs):
     """EC2 instances descriptor local invocable function.
@@ -143,17 +158,3 @@ def ec2_instances_desc(envs):
                      for region in available_regions]
     # security_groups_routine(security_groups_requests=boto_requests)
     ec2_instances_routine(ec2_instances_requests=boto_requests)
-
-
-@dispatch(dict, dict)
-def ec2_instances_desc(event, context):
-    print("DEBUG", "event", "\n", event)
-    available_regions = EC2_Boto.get_available_regions_names()
-    # # EC2 describe_instances request list
-    boto_requests = [EC2_Boto(region_name=region)
-                     for region in available_regions]
-
-    # security_groups_routine(security_groups_requests=boto_requests)
-    ec2_instances_routine(ec2_instances_requests=boto_requests)
-
-    return {"status code": 200, "body": json.dumps("Scan End V1.1")}

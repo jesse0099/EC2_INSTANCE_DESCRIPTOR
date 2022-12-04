@@ -1,3 +1,4 @@
 debugpy>=1.0,<2
 urllib3==1.26.12
 pytz==2022.6
+multipledispatch==0.6.0
