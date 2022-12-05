@@ -1,5 +1,7 @@
 import os
+import sys
 import json
+from envs import Enviroment_varibles
 from multipledispatch import dispatch
 from airtable_wrapper import Airtable_Api
 from airtable_wrapper import ec2_instances_to_records, security_groups_to_records
@@ -7,15 +9,6 @@ from botocore.exceptions import ClientError
 from boto3_wrapper import EC2_Boto, flatten
 
 # # Enviroment variables fetched from lambda context
-airtable_api_key = os.environ.get("AIRTABLE_API_KEY")
-
-airtable_base_url = os.environ.get("AIRTABLE_BASE_URL")
-
-ec2_instances_tid = os.environ.get("EC2_INSTANCES_TID")
-
-ec2_security_groups_tid = os.environ.get("EC2_SECURITY_GROUPS_TID")
-
-ec2_old_documentation_tid = os.environ.get("EC2_OLD_DOCUMENTATION_TID")
 
 
 def catch(func, *args,
@@ -37,23 +30,25 @@ def catch(func, *args,
         return handle(e, kwargs)
 
 
-def set_environment_variables(envs):
-    """Set environment variables from a context distinct from lambda.
-
-    :param envs: Dictionary of environment variables.
-    :type envs: Dictionary
+def set_environment_variables_from_os():
     """
-    global airtable_api_key, airtable_base_url, ec2_instances_tid, ec2_security_groups_tid
-    airtable_api_key = envs.get("AIRTABLE_API_KEY")
-    airtable_base_url = envs.get("AIRTABLE_BASE_URL")
-    ec2_instances_tid = envs.get("EC2_INSTANCES_TID")
-    ec2_security_groups_tid = envs.get("EC2_SECURITY_GROUPS_TID")
+    Set environment variables from os.environ
+    """
+    Enviroment_varibles.AIRTABLE_API_KEY = os.environ.get("AIRTABLE_API_KEY")
+    Enviroment_varibles.AIRTABLE_BASE_URL = os.environ.get("AIRTABLE_BASE_URL")
+    Enviroment_varibles.EC2_INSTANCES_TID = os.environ.get("EC2_INSTANCES_TID")
+    Enviroment_varibles.EC2_SECURITY_GROUPS_TID = os.environ.get(
+        "EC2_SECURITY_GROUPS_TID")
+    Enviroment_varibles.EC2_OLD_DOCUMENTATION_TID = os.environ.get(
+        "EC2_OLD_DOCUMENTATION_TID")
 
 
 def init_airtable_api_client():
-    return Airtable_Api(
-        _base_url=airtable_base_url, _api_key=airtable_api_key
-    )
+    """
+    Initialize airtable api client
+    """
+    return Airtable_Api(_base_url=Enviroment_varibles.AIRTABLE_BASE_URL,
+                        _api_key=Enviroment_varibles.AIRTABLE_API_KEY)
 
 
 def security_groups_routine(**kwargs):
@@ -81,7 +76,7 @@ def security_groups_routine(**kwargs):
     catch(
         airtable_api_client.upsert(
             _records=records,
-            _table_tid=ec2_security_groups_tid,
+            _table_tid=Enviroment_varibles.EC2_SECURITY_GROUPS_TID,
             _fields_to_merge_on=["Group ID"],
         )
     )
@@ -119,7 +114,7 @@ def ec2_instances_routine(**kwargs):
     catch(
         airtable_api_client.upsert(
             _records=records,
-            _table_tid=ec2_instances_tid,
+            _table_tid=Enviroment_varibles.EC2_INSTANCES_TID,
             _fields_to_merge_on=["Instance ID"],
         )
     )
@@ -127,7 +122,10 @@ def ec2_instances_routine(**kwargs):
 
 @dispatch(dict, object)
 def ec2_instances_desc(event, context):
-    print("DEBUG", "event", "\n", event)
+    """
+    EC2 instances descriptor lambda invocable function.
+    """
+    set_environment_variables_from_os()
     available_regions = EC2_Boto.get_available_regions_names()
     # # EC2 describe_instances request list
     boto_requests = [EC2_Boto(region_name=region)
@@ -139,22 +137,22 @@ def ec2_instances_desc(event, context):
     return {"status code": 200, "body": json.dumps("Scan End V1.1")}
 
 
-@dispatch(dict)
-def ec2_instances_desc(envs):
-    """EC2 instances descriptor local invocable function.
-
-    :param envs: A dictionary containing all the enviroment variables necessary to execute the script locally.
-    :type envs: Dictionary
-    :return: Boolean indicating whether the script was successfully executed.
-    :rtype: Boolean
+@dispatch()
+def ec2_instances_desc():
     """
-    if envs is None:
-        return False
-    set_environment_variables(envs)
-
+    EC2 instances descriptor local invocable function.
+    """
     available_regions = EC2_Boto.get_available_regions_names()
     # # EC2 describe_instances request list
     boto_requests = [EC2_Boto(region_name=region)
                      for region in available_regions]
     # security_groups_routine(security_groups_requests=boto_requests)
     ec2_instances_routine(ec2_instances_requests=boto_requests)
+
+
+def main(**kwargs):
+    ec2_instances_desc()
+
+
+if __name__ == '__main__':
+    main(**dict(arg.split('=') for arg in sys.argv[1:]))
