@@ -9,6 +9,8 @@ to interact with **Airtable API** \(REST\) without using an SDK.
 It's written and has been tested on **Python 3.9.13**. To avoid environment incompatibilities a `venv`_ is
 provided using **Poetry**.
 
+An airtable template is provided here: `Airtable Template`_.
+
 Motivation
 **********
 
@@ -37,3 +39,4 @@ Future iterations
 
 .. _boto: https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
 .. _venv: https://docs.python.org/3/library/venv.html
+.. _Airtable Template: https://airtable.com/shr26gwsF1RQMXFwf

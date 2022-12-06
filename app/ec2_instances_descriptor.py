@@ -1,7 +1,8 @@
 import os
 import sys
 import json
-from envs import Enviroment_varibles
+from envs_dev import Environment_varibles
+# from envs import Environment_varibles
 from multipledispatch import dispatch
 from airtable_wrapper import Airtable_Api
 from airtable_wrapper import ec2_instances_to_records, security_groups_to_records
@@ -34,12 +35,14 @@ def set_environment_variables_from_os():
     """
     Set environment variables from os.environ
     """
-    Enviroment_varibles.AIRTABLE_API_KEY = os.environ.get("AIRTABLE_API_KEY")
-    Enviroment_varibles.AIRTABLE_BASE_URL = os.environ.get("AIRTABLE_BASE_URL")
-    Enviroment_varibles.EC2_INSTANCES_TID = os.environ.get("EC2_INSTANCES_TID")
-    Enviroment_varibles.EC2_SECURITY_GROUPS_TID = os.environ.get(
+    Environment_varibles.AIRTABLE_API_KEY = os.environ.get("AIRTABLE_API_KEY")
+    Environment_varibles.AIRTABLE_BASE_URL = os.environ.get(
+        "AIRTABLE_BASE_URL")
+    Environment_varibles.EC2_INSTANCES_TID = os.environ.get(
+        "EC2_INSTANCES_TID")
+    Environment_varibles.EC2_SECURITY_GROUPS_TID = os.environ.get(
         "EC2_SECURITY_GROUPS_TID")
-    Enviroment_varibles.EC2_OLD_DOCUMENTATION_TID = os.environ.get(
+    Environment_varibles.EC2_OLD_DOCUMENTATION_TID = os.environ.get(
         "EC2_OLD_DOCUMENTATION_TID")
 
 
@@ -47,8 +50,8 @@ def init_airtable_api_client():
     """
     Initialize airtable api client
     """
-    return Airtable_Api(_base_url=Enviroment_varibles.AIRTABLE_BASE_URL,
-                        _api_key=Enviroment_varibles.AIRTABLE_API_KEY)
+    return Airtable_Api(_base_url=Environment_varibles.AIRTABLE_BASE_URL,
+                        _api_key=Environment_varibles.AIRTABLE_API_KEY)
 
 
 def security_groups_routine(**kwargs):
@@ -76,7 +79,7 @@ def security_groups_routine(**kwargs):
     catch(
         airtable_api_client.upsert(
             _records=records,
-            _table_tid=Enviroment_varibles.EC2_SECURITY_GROUPS_TID,
+            _table_tid=Environment_varibles.EC2_SECURITY_GROUPS_TID,
             _fields_to_merge_on=["Group ID"],
         )
     )
@@ -114,7 +117,7 @@ def ec2_instances_routine(**kwargs):
     catch(
         airtable_api_client.upsert(
             _records=records,
-            _table_tid=Enviroment_varibles.EC2_INSTANCES_TID,
+            _table_tid=Environment_varibles.EC2_INSTANCES_TID,
             _fields_to_merge_on=["Instance ID"],
         )
     )
