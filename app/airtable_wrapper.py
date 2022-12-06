@@ -157,4 +157,5 @@ class Airtable_Api:
                 headers={'Content-Type': 'application/json',
                          'Authorization': f'Bearer {self.airtable_api_key}'}
             )
-            print('REQUEST STATUS ', r.status, '\nRESPONSE DATA  ', r.data)
+            print('REQUEST STATUS ', r.status)
+            # print('REQUEST STATUS ', r.status, '\nRESPONSE DATA  ', r.data)
