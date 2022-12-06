@@ -35,22 +35,21 @@ def set_environment_variables_from_os():
     """
     Set environment variables from os.environ
     """
-    Environment_varibles.AIRTABLE_API_KEY = os.environ.get("AIRTABLE_API_KEY")
-    Environment_varibles.AIRTABLE_BASE_URL = os.environ.get(
-        "AIRTABLE_BASE_URL")
+    Environment_varibles.AIRTABLE_API_KEY = os.environ.get(
+        "AIRTABLE_API_KEY")
+    Environment_varibles.AIRTABLE_BASE_ID = os.environ.get(
+        "AIRTABLE_BASE_ID")
     Environment_varibles.EC2_INSTANCES_TID = os.environ.get(
         "EC2_INSTANCES_TID")
     Environment_varibles.EC2_SECURITY_GROUPS_TID = os.environ.get(
         "EC2_SECURITY_GROUPS_TID")
-    Environment_varibles.EC2_OLD_DOCUMENTATION_TID = os.environ.get(
-        "EC2_OLD_DOCUMENTATION_TID")
 
 
 def init_airtable_api_client():
     """
     Initialize airtable api client
     """
-    return Airtable_Api(_base_url=Environment_varibles.AIRTABLE_BASE_URL,
+    return Airtable_Api(_base_url=f"https://api.airtable.com/v0/{Environment_varibles.AIRTABLE_BASE_ID}/",
                         _api_key=Environment_varibles.AIRTABLE_API_KEY)
 
 
@@ -80,7 +79,7 @@ def security_groups_routine(**kwargs):
         airtable_api_client.upsert(
             _records=records,
             _table_tid=Environment_varibles.EC2_SECURITY_GROUPS_TID,
-            _fields_to_merge_on=["Group ID"],
+            _fields_to_merge_on=["group_id"],
         )
     )
 
@@ -118,7 +117,7 @@ def ec2_instances_routine(**kwargs):
         airtable_api_client.upsert(
             _records=records,
             _table_tid=Environment_varibles.EC2_INSTANCES_TID,
-            _fields_to_merge_on=["Instance ID"],
+            _fields_to_merge_on=["instance_id"],
         )
     )
 
@@ -134,7 +133,7 @@ def ec2_instances_desc(event, context):
     boto_requests = [EC2_Boto(region_name=region)
                      for region in available_regions]
 
-    # security_groups_routine(security_groups_requests=boto_requests)
+    security_groups_routine(security_groups_requests=boto_requests)
     ec2_instances_routine(ec2_instances_requests=boto_requests)
 
     return {"status code": 200, "body": json.dumps("Scan End V1.1")}

@@ -39,4 +39,4 @@ Future iterations
 
 .. _boto: https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
 .. _venv: https://docs.python.org/3/library/venv.html
-.. _Airtable Template: https://airtable.com/shrAV0PFpSNMhimdI
+.. _Airtable Template: https://airtable.com/shr6WQNfVLNhVMbQv

@@ -148,6 +148,8 @@ class Airtable_Api:
 
             data['records'] = records_set
             encoded_data = json.dumps(data).encode('utf-8')
+            print('INFO:AIR_WRAPPER', 'Sending', len(
+                records_set), 'records to Airtable')
             r = http.request(
                 'PATCH',
                 f'{self.base_url}{table_tid}',
@@ -155,5 +157,4 @@ class Airtable_Api:
                 headers={'Content-Type': 'application/json',
                          'Authorization': f'Bearer {self.airtable_api_key}'}
             )
-            print('INFO:AIR_WRAPPER', 'Sending', len(
-                records_set), 'records to Airtable')
+            print('REQUEST STATUS ', r.status, '\nRESPONSE DATA  ', r.data)
