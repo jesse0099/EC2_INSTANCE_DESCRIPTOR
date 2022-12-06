@@ -6,5 +6,5 @@ template_prod.yaml
 .vscode/settings.json
 .venv
 app/__pycache__
-app/envs_dev.py
+app/envs.py
 docs/build/
