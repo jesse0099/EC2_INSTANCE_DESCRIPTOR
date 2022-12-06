@@ -9,22 +9,22 @@ from urllib.parse import quote, urlencode
 # # Temporal catch, refactor on next iteration
 
 # EC2 describe_instances AirTable field names' response keys
-_instance_id = ('Instance ID', 'InstanceId')
-_security_groups = ('Security Groups', 'SecurityGroups')
-_instance_state = ('Instance State', 'State')
-_instance_type = ('Instance Type', 'InstanceType')
-_instance_name = ('Instance Name', 'Name')
-_instance_tags = ('Instance Tags', 'Tags')
-_start_date = ('Start Date', 'LaunchTime')
-_public_ip = ('Public IP', 'PublicIpAddress')
-_scanned_on_region = ('Scanned On Region', 'Region')
-_last_scan_date = 'Last Scan Date'
+_instance_id = ('instance_id', 'InstanceId')
+_security_groups = ('security_groups', 'SecurityGroups')
+_instance_state = ('instance_state', 'State')
+_instance_type = ('instance_type', 'InstanceType')
+_instance_name = ('instance_name', 'Name')
+_instance_tags = ('instance_tags', 'Tags')
+_start_date = ('start_date', 'LaunchTime')
+_public_ip = ('public_ip', 'PublicIpAddress')
+_scanned_on_region = ('scanned_on_region', 'Region')
+_last_scan_date = 'last_scan_date'
 
 
 # Security Groups Airtable field names' response keys
-_group_name = ('Group Name', 'GroupName')
-_group_id = ('Group ID', 'GroupId')
-_description = ('Description', 'Description')
+_group_name = ('group_name', 'GroupName')
+_group_id = ('group_id', 'GroupId')
+_description = ('description', 'Description')
 _empt_string = ''
 
 

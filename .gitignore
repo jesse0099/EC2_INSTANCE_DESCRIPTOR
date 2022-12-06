@@ -1,6 +1,7 @@
 .aws-sam/build/template.yaml
 .aws-sam/build.toml
 template.yaml
+template_prod.yaml
 .vscode/launch.json
 .vscode/settings.json
 .venv
