@@ -123,11 +123,13 @@ def cronjob_strategy_to_detect_terminated_ec2_instances(_scanned_instances):
     _no_more_in_docs_instances = []
     # # Get current documented instances
     airtable_api_client = init_airtable_api_client()
+    # # Sorting is not necessary here, but I wanted to test it
     airtable_api_client.get_records(
         _table_tid=Environment_varibles.EC2_INSTANCES_TID,
         _view='Grid_view',
-        _fields=['instance_id', 'start_date'],
-        _sorts=[{'field': 'instance_id', 'direction': 'desc'}])
+        _fields=['instance_id', 'instance_name', 'start_date'],
+        _sorts=[{'field': 'start_date', 'direction': 'desc'},
+                {'fields': 'instance_name', 'direction': 'asc'}])
 
 
 @ dispatch(dict, object)

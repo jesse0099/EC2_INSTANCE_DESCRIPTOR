@@ -78,6 +78,30 @@ class Airtable_Api:
         self.airtable_api_key = kwargs.get('_api_key')
         self.base_url = kwargs.get('_base_url')
 
+    @staticmethod
+    def __sortings_parameter_urlencoded(_sorts):
+        field_key, direction_key = 'field', 'direction'
+        unencoded_sorts, encoded_sorts = [], []
+        # Not empty or None value for _sorts
+        if not bool(_sorts):
+            return ''
+
+        # Fetch just the valid keys from _sorts
+        [unencoded_sorts.extend((f'sort[{index}][field]={sort.get(field_key)}',
+                                 f'sort[{index}][direction]={sort.get(direction_key)}'))
+         for index, sort in enumerate(_sorts)
+         if bool(sort.get(field_key)) and bool(sort.get(direction_key))]
+
+        None if not bool(unencoded_sorts) else [encoded_sorts.append(quote(sort, safe='='))
+                                                for sort in unencoded_sorts]
+
+        sorts_encoded_string = '&'.join(
+            encoded_sorts) if bool(encoded_sorts) else ''
+        sorts_encoded_string = '' if not bool(
+            sorts_encoded_string) else f'&{sorts_encoded_string}'
+
+        return sorts_encoded_string
+
     # Airtable API Call to get a list of records
 
     # # FilterByFormula not yet supported
@@ -90,9 +114,9 @@ class Airtable_Api:
         # # Dictionary 'param_name', 'param values[]'
         params_to_encode = {}
 
-        url = f'{self.base_url}{quote(table_tid)}'
+        url = f'{self.base_url}{table_tid}'
 
-        if fields is None or view is None:
+        if not bool(fields) or view is None:
             print('WARNING:AIR_WRAPPER', 'No fields or view specified')
             return {'records': [], 'offset': None}
 
@@ -105,25 +129,14 @@ class Airtable_Api:
         None if _page_size is None else params_to_encode.update(
             {'pageSize': _page_size})
         None if _offset is None else params_to_encode.update(
-            {'offset': quote(_offset)})
-
-        # # Creating sort strings because the encoder is a piece of shit
-        field_str, direction_str = 'field', 'direction'
-        sorts, encoded_sorts = [], []
-        if _sorts is not None:
-            [sorts.extend((f'sort[{index}][field]={sort.get(field_str)}',
-                           f'sort[{index}][direction]={sort.get(direction_str)}'))
-             for index, sort in enumerate(_sorts)]
-
-        [encoded_sorts.append(quote(sort, safe='='))
-         for sort in sorts]
-
-        sort_encoded_string = '&'.join(encoded_sorts)
+            {'offset': _offset})
 
         # # Next iterations:
         # # 1. Check for string length of the url, Airtable allows until 16k characters,
         # # if it exceeds this limit, the POST method could be used
         encoded_params = urlencode(params_to_encode, doseq=True)
+        encoded_params += Airtable_Api.__sortings_parameter_urlencoded(_sorts)
+
         url += f'?{encoded_params}'
 
         http = urllib3.PoolManager()
