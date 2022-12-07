@@ -36,10 +36,10 @@ def ec2_instances_to_records(**kwargs):
     instances = kwargs.get('instances')
     scanned_on = kwargs.get('region')
     if instances is None:
-        print('WARNING', 'Instances must not be None', scanned_on)
+        print('INFO', 'Instances must not be None', scanned_on)
         return []
     elif len(instances) == 0:
-        print('WARNING', 'Empty set of instances', scanned_on)
+        print('INFO', 'Empty set of instances', scanned_on)
         return []
     records = [{'fields': {_instance_id[0]: str(instance.get(_instance_id[1])),
                            _instance_type[0]: instance.get(_instance_type[1]),
@@ -60,11 +60,11 @@ def security_groups_to_records(**kwargs):
     groups = kwargs.get('groups')
     _scanned_on = kwargs.get('region')
     if groups is None:
-        print('WARNING:AIR_WRAPPER',
+        print('INFO:AIR_WRAPPER',
               'Security groups must not be None', _scanned_on)
         return []
     elif len(groups) == 0:
-        print('WARNING:AIR_WRAPPER', 'Empty set of groups', _scanned_on)
+        print('INFO:AIR_WRAPPER', 'Empty set of groups', _scanned_on)
         return []
     return [{'fields': {_group_name[0]: group.get(_group_name[1]),
                         _group_id[0]: group.get(_group_id[1]),
@@ -90,14 +90,15 @@ class Airtable_Api:
         # # Dictionary 'param_name', 'param values[]'
         params_to_encode = {}
 
-        url = f'{self.base_url}{table_tid}'
+        url = f'{self.base_url}{quote(table_tid)}'
 
         if fields is None or view is None:
             print('WARNING:AIR_WRAPPER', 'No fields or view specified')
             return {'records': [], 'offset': None}
 
         params_to_encode.update({'view': view})
-        params_to_encode.update({'fields': fields})
+
+        params_to_encode.update({'fields[]': fields})
 
         None if _max_records is None else params_to_encode.update(
             {'maxRecords': _max_records})
@@ -105,8 +106,19 @@ class Airtable_Api:
             {'pageSize': _page_size})
         None if _offset is None else params_to_encode.update(
             {'offset': quote(_offset)})
-        None if _sorts is None else params_to_encode.update(
-            {'sort%5B0%5D%5B': _sorts})
+
+        # # Creating sort strings because the encoder is a piece of shit
+        field_str, direction_str = 'field', 'direction'
+        sorts, encoded_sorts = [], []
+        if _sorts is not None:
+            [sorts.extend((f'sort[{index}][field]={sort.get(field_str)}',
+                           f'sort[{index}][direction]={sort.get(direction_str)}'))
+             for index, sort in enumerate(_sorts)]
+
+        [encoded_sorts.append(quote(sort, safe='='))
+         for sort in sorts]
+
+        sort_encoded_string = '&'.join(encoded_sorts)
 
         # # Next iterations:
         # # 1. Check for string length of the url, Airtable allows until 16k characters,
@@ -115,15 +127,21 @@ class Airtable_Api:
         url += f'?{encoded_params}'
 
         http = urllib3.PoolManager()
+        print('INFO:AIR_WRAPPER', 'Fetching data from', table_tid)
         r = http.request(
             'GET',
             url,
             headers={'Content-Type': 'application/json',
                      'Authorization': f'Bearer {self.airtable_api_key}'}
         )
+
+        print(' REQUEST STATUS (GET)', r.status)
+        print(' RESPONSE DATA (GET)', r.data)
+
         decoded_response = json.loads(r.data.decode('utf-8'))
         records = decoded_response.get('records')
         offset = decoded_response.get('offset')
+
         return {'records': records, 'offset': offset}
 
     # Airtable API Call to upsert records
@@ -157,5 +175,9 @@ class Airtable_Api:
                 headers={'Content-Type': 'application/json',
                          'Authorization': f'Bearer {self.airtable_api_key}'}
             )
-            print('REQUEST STATUS ', r.status)
-            # print('REQUEST STATUS ', r.status, '\nRESPONSE DATA  ', r.data)
+
+            print(' REQUEST STATUS (PATCH)', r.status)
+
+            if r.status is not 200:
+                print(' RESPONSE DATA (PATCH) ', r.data)
+                break

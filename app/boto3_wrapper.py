@@ -92,7 +92,7 @@ class EC2_Boto:
         self.instances = flatten([reservation.get('Instances') for reservation in reservations if len(
             reservation.get('Instances')) > 0])
         print('INFO:BOTO_WRAPPER', 'Number of instances:',
-              len(self.instances), 'Region:', self.region)
+              len(self.instances), ' - Region:', self.region)
 
     def upsert_ec2_tags(self, instance_id, tags):
         self.client.create_tags(

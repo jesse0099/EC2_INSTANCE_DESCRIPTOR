@@ -84,44 +84,53 @@ def security_groups_routine(**kwargs):
 
 
 def ec2_instances_routine(**kwargs):
+    records = []
+    scanned_instances = []
+
     airtable_api_client = init_airtable_api_client()
     ec2_instances_requests = kwargs.get("ec2_instances_requests")
+
     # # Fetch ec2 instances
     [catch(request.fetch_ec2_instances) for request in ec2_instances_requests]
+
+    # # Last Scanned Instances
+    [catch(scanned_instances.extend, instances_by_region.instances)
+     for instances_by_region in ec2_instances_requests]
 
     # # Create a Tag whit Key 'Description' if it's not already present
     # # Not required by the time, but even if it's present, the filled Description tags won't be override
     [catch(request.create_description_tags)
      for request in ec2_instances_requests]
 
+    # # Transform aws response into airtable records set
+    [catch(records.extend, ec2_instances_to_records(
+        instances=response.instances,
+        region=response.region))
+        for response in ec2_instances_requests]
+
+    print("INFO:EC2_INSTANCES_DESCRIPTOR",
+          " Total number of scanned ec2 instances:",
+          len(records))
     # # Send EC2 instances collected data to Airtable (Upsert)
-    records = flatten(
-        [
-            catch(
-                ec2_instances_to_records,
-                instances=response.instances,
-                region=response.region,
-            )
-            for response in ec2_instances_requests
-        ]
-    )
-
-    print(
-        "INFO:EC2_INSTANCES_DESCRIPTOR",
-        " Total number of scanned ec2 instances:",
-        len(records),
-    )
-
-    catch(
-        airtable_api_client.upsert(
-            _records=records,
-            _table_tid=Environment_varibles.EC2_INSTANCES_TID,
-            _fields_to_merge_on=["instance_id"],
-        )
-    )
+    catch(airtable_api_client.upsert(_records=records,
+                                     _table_tid=Environment_varibles.EC2_INSTANCES_TID,
+                                     _fields_to_merge_on=["instance_id"]))
+    return scanned_instances
 
 
-@dispatch(dict, object)
+def cronjob_strategy_to_detect_terminated_ec2_instances(_scanned_instances):
+    _docummented_instances = []
+    _no_more_in_docs_instances = []
+    # # Get current documented instances
+    airtable_api_client = init_airtable_api_client()
+    airtable_api_client.get_records(
+        _table_tid=Environment_varibles.EC2_INSTANCES_TID,
+        _view='Grid_view',
+        _fields=['instance_id', 'start_date'],
+        _sorts=[{'field': 'instance_id', 'direction': 'desc'}])
+
+
+@ dispatch(dict, object)
 def ec2_instances_desc(event, context):
     """
     EC2 instances descriptor lambda invocable function.
@@ -138,7 +147,7 @@ def ec2_instances_desc(event, context):
     return {"status code": 200, "body": json.dumps("Scan End V1.1")}
 
 
-@dispatch()
+@ dispatch()
 def ec2_instances_desc():
     """
     EC2 instances descriptor local invocable function.
@@ -147,8 +156,12 @@ def ec2_instances_desc():
     # # EC2 describe_instances request list
     boto_requests = [EC2_Boto(region_name=region)
                      for region in available_regions]
-    security_groups_routine(security_groups_requests=boto_requests)
-    ec2_instances_routine(ec2_instances_requests=boto_requests)
+    # security_groups_routine(security_groups_requests=boto_requests)
+    scanned_instances = ec2_instances_routine(
+        ec2_instances_requests=boto_requests)
+    cronjob_strategy_to_detect_terminated_ec2_instances(scanned_instances)
+
+    # cronjob_strategy_to_detect_terminated_ec2_instances(scanned_instances)
 
 
 def main(**kwargs):
