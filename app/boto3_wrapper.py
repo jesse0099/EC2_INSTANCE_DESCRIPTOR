@@ -49,7 +49,6 @@ class EC2_Boto:
             return desired_tag[0].get('Value')
         return ''
 
-    # # Returning bad string when tag list only contains one element, or an empty string.
     @staticmethod
     def stringify_ec2_tags(tags):
         """Stringify ec2 tags list
@@ -62,7 +61,7 @@ class EC2_Boto:
         if tags is None:
             return ''
         # Extract tags from response
-        return ','.join([tag.get('Value') for tag in tags])
+        return ','.join([tag.get('Value') for tag in tags if tag.get('Value')])
 
     @staticmethod
     def ec2_get_security_groups_ids(security_groups):

@@ -86,17 +86,18 @@ class Airtable_Api:
         if not bool(_sorts):
             return ''
 
-        # Fetch just the valid keys from _sorts
+        # Fetch just the valid keys from _sorts to create unencoded_sorts
         [unencoded_sorts.extend((f'sort[{index}][field]={sort.get(field_key)}',
                                  f'sort[{index}][direction]={sort.get(direction_key)}'))
          for index, sort in enumerate(_sorts)
          if bool(sort.get(field_key)) and bool(sort.get(direction_key))]
-
+        # Encoding the unencoded_sorts
         None if not bool(unencoded_sorts) else [encoded_sorts.append(quote(sort, safe='='))
                                                 for sort in unencoded_sorts]
-
+        # Stringify encoded_sorts
         sorts_encoded_string = '&'.join(
             encoded_sorts) if bool(encoded_sorts) else ''
+
         sorts_encoded_string = '' if not bool(
             sorts_encoded_string) else f'&{sorts_encoded_string}'
 
@@ -105,7 +106,6 @@ class Airtable_Api:
     # Airtable API Call to get a list of records
 
     # # FilterByFormula not yet supported
-    # # Sorting still work in progress
     # # Return a Dictionary containing the fetched records and an offset token
     def get_records(self, _max_records=None, _page_size=None, _offset=None, _sorts=None, **kwargs):
         table_tid = kwargs.get('_table_tid')
@@ -117,8 +117,8 @@ class Airtable_Api:
         url = f'{self.base_url}{table_tid}'
 
         if not bool(fields) or view is None:
-            print('WARNING:AIR_WRAPPER', 'No fields or view specified')
-            return {'records': [], 'offset': None}
+            print('\nINFO:AIR_WRAPPER', 'No fields or view specified')
+            return {'records': [], 'offset': None, 'errors': 1}
 
         params_to_encode.update({'view': view})
 
@@ -128,7 +128,7 @@ class Airtable_Api:
             {'maxRecords': _max_records})
         None if _page_size is None else params_to_encode.update(
             {'pageSize': _page_size})
-        None if _offset is None else params_to_encode.update(
+        None if not bool(_offset) else params_to_encode.update(
             {'offset': _offset})
 
         # # Next iterations:
@@ -148,8 +148,10 @@ class Airtable_Api:
                      'Authorization': f'Bearer {self.airtable_api_key}'}
         )
 
-        print(' REQUEST STATUS (GET)', r.status)
-        print(' RESPONSE DATA (GET)', r.data)
+        print(' REQUEST STATUS (GET)', r.status, '\n')
+        if r.status != 200:
+            print(' RESPONSE DATA (GET)', r.data, '\n')
+            return {'records': [], 'offset': None, 'errors': 1}
 
         decoded_response = json.loads(r.data.decode('utf-8'))
         records = decoded_response.get('records')
@@ -157,21 +159,65 @@ class Airtable_Api:
 
         return {'records': records, 'offset': offset}
 
-    # Airtable API Call to upsert records
+    # Airtable API Call to delete reords
+    def delete_records(self, **kwargs):
+        table_tid = kwargs.get('_table_tid')
+        records = kwargs.get('_records')
+        affected_rows = []
+        # # Dictionary 'param_name', 'param values[]'
+        params_to_encode = {}
+
+        if not bool(records):
+            print('\nINFO:AIR_WRAPPER (DELETE)', 'No records specified')
+            return {'records': [], 'offset': None, 'errors': 10}
+
+        for records_set in chunker(records, 10):
+            url = f'{self.base_url}{table_tid}'
+            params_to_encode.update({'records': records_set})
+
+            encoded_params = urlencode(params_to_encode, doseq=True)
+
+            url += f'?{encoded_params}'
+
+            http = urllib3.PoolManager()
+
+            print('INFO:AIR_WRAPPER', 'Deleting data from', table_tid)
+
+            r = http.request(
+                'DELETE',
+                url,
+                headers={'Content-Type': 'application/json',
+                         'Authorization': f'Bearer {self.airtable_api_key}'})
+
+            print(' REQUEST STATUS (DELETE)', r.status, '\n')
+
+            if r.status != 200:
+                print(' RESPONSE DATA (DELETE) ', r.data, '\n')
+                [print(record) for record in records_set]
+                return {'affected_rows': affected_rows, 'errors': 1}
+
+            decoded_response = json.loads(r.data.decode('utf-8'))
+
+            None if not bool(decoded_response.get('records')) else affected_rows.extend(
+                decoded_response.get('records'))
+
+        return {'affected_rows': affected_rows}
 
     def upsert(self, **kwargs):
         table_tid = kwargs.get('_table_tid')
         records = kwargs.get('_records')
+        affected_rows = []
+
         fields_to_merge_on = kwargs.get('_fields_to_merge_on')
+
         if (records is None):
-            print('WARNING:AIR_WRAPPER', 'Records must not be None')
-            return
+            print('\nINFO:AIR_WRAPPER', 'Records must not be None')
+            return {'affected_rows': affected_rows, 'errors': 1}
+
         http = urllib3.PoolManager()
 
         # Airtable only allows 10 records per request
         for records_set in chunker(records, 10):
-            # Dev Print
-
             # Upsert Call Params
             data = {'performUpsert': {
                 "fieldsToMergeOn": fields_to_merge_on},
@@ -189,8 +235,15 @@ class Airtable_Api:
                          'Authorization': f'Bearer {self.airtable_api_key}'}
             )
 
-            print(' REQUEST STATUS (PATCH)', r.status)
+            print(' REQUEST STATUS (PATCH) ', r.status, '\n')
 
-            if r.status is not 200:
-                print(' RESPONSE DATA (PATCH) ', r.data)
-                break
+            if r.status != 200:
+                print(' RESPONSE DATA (PATCH) ', r.data, '\n')
+                return {'affected_rows': affected_rows, 'errors': 1}
+
+            decoded_response = json.loads(r.data.decode('utf-8'))
+
+            None if not bool(decoded_response.get('records')) else affected_rows.extend(
+                decoded_response.get('records'))
+
+        return {'affected_rows': affected_rows}
