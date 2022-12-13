@@ -2,12 +2,15 @@ import re
 import os
 import sys
 import json
+import logging
 from envs import Environment_varibles
 from multipledispatch import dispatch
 from airtable_wrapper import Airtable_Api
 from airtable_wrapper import ec2_instances_to_records, security_groups_to_records
 from botocore.exceptions import ClientError
 from boto3_wrapper import EC2_Boto, flatten
+
+logger = logging.getLogger(__name__)
 
 # # Template dictionary to return when an exception is raised (not yet implemented)
 exception_return_template = {
@@ -216,6 +219,10 @@ def ec2_instances_documentation_routine(**kwargs):
           'Ending scan AWS EC2 security groups\n')
     return {'scanned_instances': scanned_instances,
             'documented_instances': documented_instances}
+
+
+def get_aws_iams():
+    pass
 
 
 @ dispatch(dict, object)
