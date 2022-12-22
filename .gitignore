@@ -4,6 +4,7 @@ template.yaml
 template_prod.yaml
 .vscode/launch.json
 .vscode/settings.json
+.vscode/sftp.json
 .venv
 app/__pycache__
 app/envs.py
