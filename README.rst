@@ -6,9 +6,9 @@ EC2 INSTANCES DESCRIPTOR
 Installation/Usage
 ^^^^^^^^^^^^^^^^^^
 
-**Project Public Repository :**  `GitHub Repository`_.
-**Detailed documentation :** `EC2_Descriptor`_.
-
+| **Project Public Repository :**  `GitHub Repository`_.
+| **Detailed documentation :** `EC2_Descriptor`_.
+|
 EC2 instances descriptor is a script that wraps boto (Amazon Official SDK for python) to make it easier to use on traceability processes as well as to enforce “resources state changed” policies (creations, terminations, modifications). Also, a set of classes and methods is provided to interact with Airtable API (REST) without using an SDK.
 
 It’s written and has been tested on Python 3.9.13. To avoid environment incompatibilities a venv is provided using Poetry.
@@ -19,13 +19,43 @@ the specification of SAM \(Serverless Application Model\).
 Clone Project Repository
 ************************
 
-Use git clone; 
+| Use git clone:
 
 .. code-block:: console
-    git clone: https://github.com/jesse0099/EC2_INSTANCE_DESCRIPTOR
+
+    git clone https://github.com/jesse0099/EC2_INSTANCE_DESCRIPTOR
 
 or your favorite method
 for this task. 
+
+Create envs.py file
+*******************
+
+Inside the repository root directory::
+
+    Repository-Location/
+       └──EC2_INSTANCE_DESCRIPTOR/
+           └──app/
+              └── envs.py.example
+              
+You'll find the file `envs.py.example`, make a copy of it named `envs.py` and place it in the same location 
+that `envs.py.example`
+
+| Command line one-liner options:
+|
+|  **Powershell**
+
+.. code-block:: console
+
+    Copy-Item .\envs.py.example .\envs.py
+    
+| **Linux distros with cp available**
+.. code-block:: console 
+    
+    cp .\envs.py.example .\envs.py
+
+
+    
 
 .. _Docker Install: https://docs.docker.com/get-docker/
 .. _Poetry Docs and Install: https://python-poetry.org/docs/
