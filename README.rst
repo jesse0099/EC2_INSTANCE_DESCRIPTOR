@@ -7,7 +7,7 @@ Installation/Usage
 ^^^^^^^^^^^^^^^^^^
 
 | **Project Public Repository :**  `GitHub Repository`_.
-| **Detailed documentation :** `EC2_Descriptor`_.
+| **Detailed documentation :** `EC2 Descriptor`_.
 |
 EC2 instances descriptor is a script that wraps boto (Amazon Official SDK for python) to make it easier to use on traceability processes as well as to enforce “resources state changed” policies (creations, terminations, modifications). Also, a set of classes and methods is provided to interact with Airtable API (REST) without using an SDK.
 
@@ -54,12 +54,45 @@ that `envs.py.example`
     
     cp .\envs.py.example .\envs.py
 
+Clone Airtable Template
+***********************
 
+First, you need an Airtable account. Once you created one, continue.
+
+**Template:** `Airtable Template`_.
+
+Open the template provided above and click on "copy base"
+
+.. image:: docs/images/airtable_template_readme.PNG
+    :width: 600
+    :height: 300
+    :alt: airtable base template
     
+Replace envs.py file values with yours
+**************************************
 
+API key 
+^^^^^^^
+
+**You can get your api key visiting the account section of your airtable profile:** `Airtable API Key`_.
+
+Tables IDs and Base ID
+^^^^^^^^^^
+
+Once you cloned the base, you can access it from the workspaces panel, located in the account section 
+where the API key can also be found. Open your base, and check the URL. You can get the **Base ID**
+and the **Tables IDs** from it. Select the different tables to get the corresponding table ID.
+
+.. image:: docs/images/airtable_vars_source.PNG
+    :width: 600
+    :height: 100
+    :alt: airtable tables ids and base id from url
+
+.. _Airtable Template: https://airtable.com/shr6WQNfVLNhVMbQv
+.. _Airtable API key: https://airtable.com/account
 .. _Docker Install: https://docs.docker.com/get-docker/
 .. _Poetry Docs and Install: https://python-poetry.org/docs/
 .. _Python Docs and Install \(3.9\): https://www.python.org/downloads/
 .. _GitHub Repository: https://github.com/jesse0099/EC2_INSTANCE_DESCRIPTOR
 .. _poetry shell: https://python-poetry.org/docs/cli/#:~:text=has%20no%20option.-,shell,-The%20shell%20command
-.. _EC2_Descriptor: https://ec2-instance-descriptor.readthedocs.io/en/latest/
+.. _EC2 Descriptor: https://ec2-instance-descriptor.readthedocs.io/en/latest/
