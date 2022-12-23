@@ -31,7 +31,7 @@ for this task.
 Create envs.py file
 *******************
 
-Inside the repository root directory::
+Inside app directory::
 
     Repository-Location/
        └──EC2_INSTANCE_DESCRIPTOR/
@@ -88,6 +88,44 @@ and the **Tables IDs** from it. Select the different tables to get the correspon
     :height: 100
     :alt: airtable tables ids and base id from url
 
+Open the virtual environment shell
+**********************************
+
+Inside the repository root directory::
+
+    Repository-Location/
+       └──EC2_INSTANCE_DESCRIPTOR/
+
+.. code-block:: console
+
+    poetry shell
+
+Install dependencies
+********************
+
+*Check if you're inside the venv: Execute pwd command and verify that ec2-instance-descriptor-py3.9 name is present*
+
+Inside the venv shell (ec2-instance-descriptor-py3.9):
+
+.. code-block:: console
+
+    poetry install; poetry install -E all_extras
+
+Execute locally
+***************
+
+Inside the venv shell (ec2-instance-descriptor-py3.9), under app directory::
+
+    Repository-Location/
+       └──EC2_INSTANCE_DESCRIPTOR/
+           └──app/
+
+.. code-block:: console
+    
+    python ./ec2_instances_descriptor.py 
+
+
+ 
 .. _Airtable Template: https://airtable.com/shr6WQNfVLNhVMbQv
 .. _Airtable API key: https://airtable.com/account
 .. _Docker Install: https://docs.docker.com/get-docker/
@@ -96,3 +134,9 @@ and the **Tables IDs** from it. Select the different tables to get the correspon
 .. _GitHub Repository: https://github.com/jesse0099/EC2_INSTANCE_DESCRIPTOR
 .. _poetry shell: https://python-poetry.org/docs/cli/#:~:text=has%20no%20option.-,shell,-The%20shell%20command
 .. _EC2 Descriptor: https://ec2-instance-descriptor.readthedocs.io/en/latest/
+
+
+
+
+
+ 
