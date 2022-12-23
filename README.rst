@@ -57,7 +57,7 @@ that `envs.py.example`
 Clone Airtable Template
 ***********************
 
-First, you need and Airtable account. Once you created one, continue.
+First, you need an Airtable account. Once you created one, continue.
 
 **Template:** `Airtable Template`_.
 
@@ -65,10 +65,31 @@ Open the template provided above and click on "copy base"
 
 .. image:: docs/images/airtable_template_readme.PNG
     :width: 600
-    :height: 400
+    :height: 300
     :alt: airtable base template
+    
+Replace envs.py file values with yours
+**************************************
+
+API key 
+^^^^^^^
+
+**You can get your api key visiting the account section of your airtable profile:** `Airtable API Key`_.
+
+Tables IDs and Base ID
+^^^^^^^^^^
+
+Once you cloned the base, you can access it from the workspaces panel, located in the account section 
+where the API key can also be found. Open your base, and check the URL. You can get the **Base ID**
+and the **Tables IDs** from it. Select the different tables to get the corresponding table ID.
+
+.. image:: docs/images/airtable_vars_source.PNG
+    :width: 600
+    :height: 100
+    :alt: airtable tables ids and base id from url
 
 .. _Airtable Template: https://airtable.com/shr6WQNfVLNhVMbQv
+.. _Airtable API key: https://airtable.com/account
 .. _Docker Install: https://docs.docker.com/get-docker/
 .. _Poetry Docs and Install: https://python-poetry.org/docs/
 .. _Python Docs and Install \(3.9\): https://www.python.org/downloads/
