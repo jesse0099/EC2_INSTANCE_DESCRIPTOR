@@ -8,4 +8,5 @@ template_prod.yaml
 .venv
 app/__pycache__
 app/envs.py
+app/docker-env
 docs/build/

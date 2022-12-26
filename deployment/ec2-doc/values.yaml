@@ -1,0 +1,15 @@
+namespace: im-robot
+schedule: '"0 6 * * *"'
+restartPolicy: OnFailure
+serviceAccount: "irsa-ec2-read-only"
+image:
+  repository: 168476488911.dkr.ecr.us-east-1.amazonaws.com/ec2-doc
+  tag: latest
+  pullPolicy: Always 
+
+secrets:
+  name: ec2-doc
+  AIRTABLE_API_KEY: ""
+  AIRTABLE_BASE_ID: ""
+  EC2_INSTANCES_TID: ""
+  EC2_SECURITY_GROUPS_TID: ""
