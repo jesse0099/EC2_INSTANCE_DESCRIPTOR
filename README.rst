@@ -134,6 +134,7 @@ How to run:
 - create a file with necessaries variables in app folder called docker-env. if DEV_MODE is True you need to define AIRTABLE_API_KEY, AIRTABLE_BASE_ID, EC2_INSTANCES_TID and EC2_SECURITY_GROUPS_TID in env.py and set in docker-env just DEV_MODE and AWS_PROFILE (the profile should exists on your local), when DEV_MODE is False you need to set the all the variables mentioned in docker-env
 
 .. code-block:: console
+
     AIRTABLE_API_KEY=keyxxxx
     AIRTABLE_BASE_ID=appxxxx
     EC2_INSTANCES_TID=tblbxxxx
@@ -144,11 +145,13 @@ How to run:
 - build the image 
 
 .. code-block:: console
+
     docker image build -t ec2-doc .
 
 - run
 
 .. code-block:: console
+
     docker run -v ~/.aws/:/root/.aws:ro --env-file ./app/docker-env ec2-doc
 
 How to deploy in kubernetes:
@@ -157,6 +160,7 @@ How to deploy in kubernetes:
 - inside deployment/ec2-doc/ run:
 
 .. code-block:: console
+    
     helm install ec2-doc . --values values.yaml
 
 .. _Airtable Template: https://airtable.com/shr6WQNfVLNhVMbQv
