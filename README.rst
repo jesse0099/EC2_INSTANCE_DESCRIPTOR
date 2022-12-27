@@ -156,7 +156,10 @@ How to run:
 
 How to deploy in kubernetes:
 ****************************
-- Define vars in deployment/ec2-doc/values.yaml in secrets section
+
+This tool uses IRSA, so make sure that it's already set in the cluster
+
+- Define vars in deployment/ec2-doc/values.yaml
 - inside deployment/ec2-doc/ run:
 
 .. code-block:: console
