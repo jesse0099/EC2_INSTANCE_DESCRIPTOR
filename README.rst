@@ -140,7 +140,7 @@ How to run:
     EC2_INSTANCES_TID=tblbxxxx
     EC2_SECURITY_GROUPS_TID=tblnxxxx
     DEV_MODE=True
-    AWS_PROFILE=buyside
+    AWS_PROFILE=test
 
 - build the image 
 
@@ -160,7 +160,7 @@ How to deploy in kubernetes:
 - inside deployment/ec2-doc/ run:
 
 .. code-block:: console
-    
+
     helm install ec2-doc . --values values.yaml
 
 .. _Airtable Template: https://airtable.com/shr6WQNfVLNhVMbQv
