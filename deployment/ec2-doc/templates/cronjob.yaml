@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: {{ .Chart.Name }}
+spec:
+  schedule: {{ .Values.schedule }}
+  successfulJobsHistoryLimit: 0 
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: {{ .Chart.Name }} 
+        spec:      
+          serviceAccountName: {{ .Values.serviceAccount }}
+          containers:
+          - name: {{ .Chart.Name }}
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }} 
+            env: 
+              - name: AIRTABLE_API_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: ec2-doc
+                    key: AIRTABLE_API_KEY
+              - name: AIRTABLE_BASE_ID
+                valueFrom:
+                  secretKeyRef:
+                    name: ec2-doc
+                    key: AIRTABLE_BASE_ID
+              - name: EC2_INSTANCES_TID
+                valueFrom:
+                  secretKeyRef:
+                    name: ec2-doc
+                    key: EC2_INSTANCES_TID
+              - name: EC2_SECURITY_GROUPS_TID
+                valueFrom:
+                  secretKeyRef:
+                    name: ec2-doc
+                    key: EC2_SECURITY_GROUPS_TID
+              - name: DEV_MODE
+                valueFrom:
+                value: "False"
+          restartPolicy: {{ .Values.restartPolicy }}

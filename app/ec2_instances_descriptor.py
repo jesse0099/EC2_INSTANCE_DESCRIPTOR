@@ -262,6 +262,10 @@ def ec2_instances_desc():
 
 
 def main(**kwargs):
+    dev_mode = os.environ.get('DEV_MODE', 'True') == 'True'
+    if not dev_mode:
+        print('INFO: PROD MODE')
+        set_environment_variables_from_os()
     ec2_instances_desc()
 
 
