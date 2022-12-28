@@ -1,5 +1,7 @@
 import boto3
+import copy
 from botocore.exceptions import ClientError
+from copy import deepcopy
 # probably need refactor
 _group_id = ('Group ID', 'GroupId')
 
@@ -8,12 +10,71 @@ def flatten(l):
     return [item for sublist in l for item in sublist]
 
 
-class EC2_Boto:
-    client_type_ec2 = 'ec2'
-    # No region name defined for the static_client
-    static_client = boto3.client(client_type_ec2)
+class IAM_Boto:
+    client_type = 'iam'
 
-    @staticmethod
+    def __init__(self, dry_run=False):
+        self.client = boto3.client(IAM_Boto.client_type)
+        self.account_users_arns = []
+
+    def get_account_users_arns(self):
+        """
+        Get all users arns in the account
+        :return: a new list of users arns
+        :rtype: [string...]
+        """
+        self.account_users_arns = []
+        paginator = self.client.get_paginator('list_users')
+
+        [[self.account_users_arns.append(user['Arn'])
+            for user in response.get('Users')
+            if user.get('Arn')]
+         for response in paginator.paginate()
+         if response.get('Users')]
+
+        return deepcopy(self.account_users_arns)
+
+    def get_arn_policies_granting_services_access(self, _arn, _services_namespaces):
+        """
+        Get all policies that grant access to a list of services.
+        :param _arn: Arn(amazon resource name) can be: User, Group, Role
+        :type _arn: string
+        :param _services_namespaces: AWS services namespaces where access wants to be checked
+        :type _services_namespaces: [string...]
+        :return: a new list of dictionaries
+        :rtype: [{Policies, ServiceNamespace}]
+        """
+        user_policies_granting_access = []
+        marker = ''
+
+        while True:
+            response = self.client.list_policies_granting_service_access(
+                Marker=marker,
+                Arn=_arn,
+                ServiceNamespaces=_services_namespaces
+            ) if marker else self.client.list_policies_granting_service_access(
+                Arn=_arn,
+                ServiceNamespaces=_services_namespaces
+            )
+
+            if response.get('PoliciesGrantingServiceAccess'):
+                user_policies_granting_access.extend(
+                    response.get('PoliciesGrantingServiceAccess'))
+
+            if not response.get('IsTruncated'):
+                break
+
+            marker = response.get('Marker')
+
+        return user_policies_granting_access
+
+
+class EC2_Boto:
+    client_type = 'ec2'
+    # No region name defined for the static_client
+    static_client = boto3.client(client_type)
+
+    @ staticmethod
     def get_available_regions_names():
         try:
             return [region['RegionName'] for region in EC2_Boto.static_client.describe_regions()['Regions']]
@@ -21,7 +82,7 @@ class EC2_Boto:
             print('EXCEPTION:BOTO_WRAPPER', e)
             return []
 
-    @staticmethod
+    @ staticmethod
     def tag_exists(instance, tag_key):
         tags = instance.get('Tags')
         if tags is None:
@@ -30,7 +91,7 @@ class EC2_Boto:
             return False
         return len([tag for tag in instance.get('Tags') if tag.get('Key') == tag_key])
 
-    @staticmethod
+    @ staticmethod
     def ec2_tags_get_value(tags, key):
         """Get the value of an ec2-tag, given a tags list and a key.
 
@@ -49,7 +110,7 @@ class EC2_Boto:
             return desired_tag[0].get('Value')
         return ''
 
-    @staticmethod
+    @ staticmethod
     def stringify_ec2_tags(tags):
         """Stringify ec2 tags list
 
@@ -63,18 +124,19 @@ class EC2_Boto:
         # Extract tags from response
         return ','.join([tag.get('Value') for tag in tags if tag.get('Value')])
 
-    @staticmethod
+    @ staticmethod
     def ec2_get_security_groups_ids(security_groups):
         if security_groups is None:
             return []
         return [group.get(_group_id[1]) for group in security_groups if group is not None]
 
-    @staticmethod
+    @ staticmethod
     def upsert_ec2_tags_static(region_name, tags, instance_id):
         EC2_Boto.static_client = boto3.client(
-            EC2_Boto.client_type_ec2, region_name=region_name)
-        EC2_Boto.static_client.create_tags(Resources=[instance_id], Tags=tags)
-        EC2_Boto.static_client = boto3.client(EC2_Boto.client_type_ec2)
+            EC2_Boto.client_type, region_name=region_name)
+        EC2_Boto.static_client.create_tags(
+            Resources=[instance_id], Tags=tags)
+        EC2_Boto.static_client = boto3.client(EC2_Boto.client_type)
 
     def __init__(self, region_name, dry_run=False):
         self.instances = []
@@ -82,7 +144,7 @@ class EC2_Boto:
         self.security_groups = []
         self.dry_run = dry_run
         self.client = boto3.client(
-            EC2_Boto.client_type_ec2, region_name=region_name)
+            EC2_Boto.client_type, region_name=region_name)
 
     def fetch_ec2_instances(self):
         describe_instance_response = self.client.describe_instances(
