@@ -1,177 +1,176 @@
-########
-Examples
-########
-
-******************
+########################
+EC2 INSTANCES DESCRIPTOR
+########################
+    
+^^^^^^^^^^^^^^^^^^
 Installation/Usage
-******************
+^^^^^^^^^^^^^^^^^^
 
-**Project Public Repository :**  `GitHub Repository`_.
+| **Project Public Repository :**  `GitHub Repository`_.
+| **Detailed documentation :** `EC2 Descriptor`_.
+|
+EC2 instances descriptor is a script that wraps boto (Amazon Official SDK for python) to make it easier to use on traceability processes as well as to enforce “resources state changed” policies (creations, terminations, modifications). Also, a set of classes and methods is provided to interact with Airtable API (REST) without using an SDK.
 
-The Script is being developed assuming an AWS lambda function execution environment, according to 
+It’s written and has been tested on Python 3.9.13. To avoid environment incompatibilities a venv is provided using Poetry.
+
+The Script can be deployed locally and toward an AWS lambda function execution environment, according to 
 the specification of SAM \(Serverless Application Model\).
 
-.. todo:: 
-    The template is not present in the public repository due to security reasons. 
-    Future versions will include a secure template defining all necessary AWS resources.
+Clone Project Repository
+************************
 
+| Use git clone:
 
-Required tools
-**************
+.. code-block:: console
 
-    Tools installation and documentation references:
-        * `Poetry Docs and Install`_.
-        * `SAM cli Install`_.
-        * `Docker Install`_.
-        * `Python Docs and Install \(3.9\)`_.
+    git clone https://github.com/jesse0099/EC2_INSTANCE_DESCRIPTOR
 
+or your favorite method
+for this task. 
 
-Dependencies
-************
+Create envs.py file
+*******************
 
-    Presupposing all the above tools are installed and the repository has been cloned. Also, a suitable
-    ``template.yaml`` file is available at the repository root directory. The next step is to activate or
-    create the virtual environment.
+Inside app directory::
 
-Poetry venv activation/creation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    Repository-Location/
+       └──EC2_INSTANCE_DESCRIPTOR/
+           └──app/
+              └── envs.py.example
+              
+You'll find the file `envs.py.example`, make a copy of it named `envs.py` and place it in the same location 
+that `envs.py.example`
 
-    At the root of the repository, the following files are available:
+| Command line one-liner options:
+|
+|  **Powershell**
 
-    * ``poetry.toml``: Local poetry configuration file.
-    * ``pyproject.toml``: Dependencies configuration file.
-    * ``poetry.lock``: Dependencies lock file.
+.. code-block:: console
 
-    The ``poetry.toml`` file contains the followings **Poetry Virtualenvs** options:
-
-        * **create** = *true* 
-            If no other venv is active, It'll create one. Otherwise, nothing is done.
-
-        * **in-project** = *true*
-            If set to true, the virtual environment will be created in the project root directory
-            under *.venv/*.
-
-    Poetry will try to create the virtual environment on calls to the command ``poetry``. But this can
-    be done manually by executing `poetry shell`_.
-
-    Once the virtual environment is created, activating it is as easy as executing the
-    followings  One-Liners:
-
-    * ``source $(poetry env info --path)/bin/activate``
-    * ``&((poetry env info --path) + "\Scripts\activate.ps1")``
-
-Poetry venv deactivation/exit
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-    Once the virtual environment is active and a shell to it is present, deactivation/exit can be
-    achieved by the followings commands:
-
-    * ``deactivate``
-    * ``exit``
-
-    In depth information can be found in: {}.
-
-Poetry, dependencies installation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-*Inside the virtual environment*
-
-|   The following command will install all the not optional dependencies defined in the ``pyproject.toml``:
+    Copy-Item .\envs.py.example .\envs.py
     
-        ``poetry install``: The install command reads the ``pyproject.toml`` file from the current project, 
-        resolves the dependencies, and installs them.
+| **Linux distros with cp available**
+.. code-block:: console 
+    
+    cp .\envs.py.example .\envs.py
 
-|   However, optional dependencies wont be, so we have to this manually:
+Clone Airtable Template
+***********************
 
-        ``poetry install -E {extra_name}``: Install the specified extra group.
+First, you need an Airtable account. Once you created one, continue.
 
-|    Optional dependencies installation:
+**Template:** `Airtable Template`_.
 
-       * ``poetry install -E all_extras``      
-            **Install all extras**
+Open the template provided above and click on "copy base"
 
-       * ``poetry install -E build_and_debug``
-            **Install boto3 and debugpy**
+.. image:: docs/images/airtable_template_readme.PNG
+    :width: 600
+    :height: 300
+    :alt: airtable base template
+    
+Replace envs.py file values with yours
+**************************************
 
-       * ``poetry install -E docs``            
-            **Install sphinx and sphinx-rtd-theme**
-
-Execution 
-*********
-
-Build
-^^^^^
-| ``sam build``
-
-.. note::
-    Execute at repository root level. In depth information can be found in: {}.
-
-Local Invoke
-^^^^^^^^^^^^
-| ``sam local invoke``
-
-.. note::
-    Execute at repository root level. In depth information can be found in: {}.
-
-Debug 
-***** 
-
-VS Code AWS Toolkit
-^^^^^^^^^^^^^^^^^^^
-
-Debugpy
+API key 
 ^^^^^^^
 
-Deploy
-******
-| ``sam deploy --s3-bucket {My S3 Bucket}``
-|       ``--s3-prefix {My S3 Bucket Prefix}`` 
-|       ``--image-repository {AWS ECR URI}``
-|       ``--region {AWS Region name}``
-|       ``--stack-name {AWS Stack Name}`` 
-|       ``--capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM``
+**You can get your api key visiting the account section of your airtable profile:** `Airtable API Key`_.
 
-.. note::
-    Execute at repository root level. In depth information can be found in: {}.
+Tables IDs and Base ID
+^^^^^^^^^^
 
-Build the Docs
-**************
+Once you cloned the base, you can access it from the workspaces panel, located in the account section 
+where the API key can also be found. Open your base, and check the URL. You can get the **Base ID**
+and the **Tables IDs** from it. Select the different tables to get the corresponding table ID.
 
-To build the documentation, you only need Sphinx, a theme of your choice, and, of course,
-the docs/source directory. You can use the Sphinx module provided as optional in the 
-"pyproject.toml" file. 
+.. image:: docs/images/airtable_vars_source.PNG
+    :width: 600
+    :height: 100
+    :alt: airtable tables ids and base id from url
 
-*Inside the virtual environment*
+Open the virtual environment shell
+**********************************
 
-Move to docs/. Once you have done that, you can execute the following commands:
+Inside the repository root directory::
 
-    * ``make clean``
-        Deletes the content of docs/build folder.
-    * ``make html``
-        Based on the content of the docs/source directory and the doc-strings from the app/,  
-        generates documentation for the project in HTML under docs/build. Other formats are available, 
-        as you can see in `Sphinx Docs`_. 
+    Repository-Location/
+       └──EC2_INSTANCE_DESCRIPTOR/
 
+.. code-block:: console
 
-After executing ``make html``, local documentation will be available. However, the readTheDocs-Page won't 
-be updated. To accomplish the online docs update. You need to commit and push the desired changes to the 
-master branch.
+    poetry shell
 
-.. note::
-    Execute at repository root/docs level. In depth information can be found in: `Sphinx Docs`_.
+Install dependencies
+********************
 
-.. todo::
-    Installation/Usage documentation is not as detailed as I would like. 
-    Fix it when the time comes.
-.. todo::
-    Explain the reason to create optional dependencies.
-.. todo::
-    Populate in depth information where required. When the time comes.
+*Check if you're inside the venv: Execute pwd command and verify that ec2-instance-descriptor-py3.9 name is present*
 
-.. _SAM cli Install: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html
+Inside the venv shell (ec2-instance-descriptor-py3.9):
+
+.. code-block:: console
+
+    poetry install; poetry install -E all_extras
+
+Execute locally
+***************
+
+Inside the venv shell (ec2-instance-descriptor-py3.9), under app directory::
+
+    Repository-Location/
+       └──EC2_INSTANCE_DESCRIPTOR/
+           └──app/
+
+.. code-block:: console
+    
+    python ./ec2_instances_descriptor.py 
+
+Execute with docker
+*******************
+
+Requisites:
+- aws cli configured locally, associated with a key with the necessary permissions
+
+How to run:
+- create a file with necessaries variables in app folder called docker-env. if DEV_MODE is True you need to define AIRTABLE_API_KEY, AIRTABLE_BASE_ID, EC2_INSTANCES_TID and EC2_SECURITY_GROUPS_TID in env.py and set in docker-env just DEV_MODE and AWS_PROFILE (the profile should exists on your local), when DEV_MODE is False you need to set the all the variables mentioned in docker-env
+
+.. code-block:: console
+
+    AIRTABLE_API_KEY=keyxxxx
+    AIRTABLE_BASE_ID=appxxxx
+    EC2_INSTANCES_TID=tblbxxxx
+    EC2_SECURITY_GROUPS_TID=tblnxxxx
+    DEV_MODE=True
+    AWS_PROFILE=test
+
+- build the image 
+
+.. code-block:: console
+
+    docker image build -t ec2-doc .
+
+- run
+
+.. code-block:: console
+
+    docker run -v ~/.aws/:/root/.aws:ro --env-file ./app/docker-env ec2-doc
+
+How to deploy in kubernetes:
+****************************
+
+This tool uses IRSA, so make sure that it's already set in the cluster
+
+- Define vars in deployment/ec2-doc/values.yaml
+- inside deployment/ec2-doc/ run:
+
+.. code-block:: console
+
+    helm install ec2-doc . --values values.yaml
+
+.. _Airtable Template: https://airtable.com/shr6WQNfVLNhVMbQv
+.. _Airtable API key: https://airtable.com/account
 .. _Docker Install: https://docs.docker.com/get-docker/
 .. _Poetry Docs and Install: https://python-poetry.org/docs/
 .. _Python Docs and Install \(3.9\): https://www.python.org/downloads/
 .. _GitHub Repository: https://github.com/jesse0099/EC2_INSTANCE_DESCRIPTOR
 .. _poetry shell: https://python-poetry.org/docs/cli/#:~:text=has%20no%20option.-,shell,-The%20shell%20command
-.. _Sphinx Docs: https://www.sphinx-doc.org/en/master/
+.. _EC2 Descriptor: https://ec2-instance-descriptor.readthedocs.io/en/latest/
