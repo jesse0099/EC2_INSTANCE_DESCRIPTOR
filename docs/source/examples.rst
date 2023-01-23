@@ -63,7 +63,7 @@ First, you need an Airtable account. Once you created one, continue.
 
 Open the template provided above and click on "copy base"
 
-.. image:: ../docs/images/airtable_template_readme.PNG
+.. image:: /images/airtable_template_readme.PNG
     :width: 600
     :height: 300
     :alt: airtable base template
@@ -83,7 +83,7 @@ Once you cloned the base, you can access it from the workspaces panel, located i
 where the API key can also be found. Open your base, and check the URL. You can get the **Base ID**
 and the **Tables IDs** from it. Select the different tables to get the corresponding table ID.
 
-.. image:: ../docs/images/airtable_vars_source.PNG
+.. image:: /images/airtable_vars_source.PNG
     :width: 600
     :height: 100
     :alt: airtable tables ids and base id from url
