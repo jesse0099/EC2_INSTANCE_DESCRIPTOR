@@ -63,7 +63,7 @@ First, you need an Airtable account. Once you created one, continue.
 
 Open the template provided above and click on "copy base"
 
-.. image:: https://github.com/jesse0099/EC2_INSTANCE_DESCRIPTOR/blob/master/docs/images/airtable_template_readme.PNG
+.. image:: ../images/airtable_template_readme.PNG
     :width: 600
     :height: 300
     :alt: airtable base template
